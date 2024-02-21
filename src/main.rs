@@ -1,18 +1,50 @@
-use fltk::{app, button::Button, frame::Frame, group::Flex, prelude::*, window::Window};
+use iced::widget::{button, column, text};
+use iced::{Alignment, Element, Sandbox, Settings};
 
-fn main() {
-    let app = app::App::default().with_scheme(app::Scheme::Oxy);
-    let mut wind = Window::default().with_size(400, 300).with_label("Saage");
-    let mut col = Flex::default_fill().column();
-    col.set_margins(120, 80, 120, 80);
-    let mut frame = Frame::default();
-    let mut but = Button::default().with_label("Click me!");
-    col.fixed(&but, 40);
-    col.end();
-    wind.end();
-    wind.show();
+pub fn main() -> iced::Result {
+    Counter::run(Settings::default())
+}
 
-    but.set_callback(move |_| frame.set_label("Hello world"));
+struct Counter {
+    value: i32,
+}
 
-    app.run().unwrap();
+#[derive(Debug, Clone, Copy)]
+enum Message {
+    IncrementPressed,
+    DecrementPressed,
+}
+
+impl Sandbox for Counter {
+    type Message = Message;
+
+    fn new() -> Self {
+        Self { value: 0 }
+    }
+
+    fn title(&self) -> String {
+        String::from("Counter - Iced")
+    }
+
+    fn update(&mut self, message: Message) {
+        match message {
+            Message::IncrementPressed => {
+                self.value += 1;
+            }
+            Message::DecrementPressed => {
+                self.value -= 1;
+            }
+        }
+    }
+
+    fn view(&self) -> Element<Message> {
+        column![
+            button("Increment").on_press(Message::IncrementPressed),
+            text(self.value).size(50),
+            button("Decrement").on_press(Message::DecrementPressed)
+        ]
+        .padding(20)
+        .align_items(Alignment::Center)
+        .into()
+    }
 }
